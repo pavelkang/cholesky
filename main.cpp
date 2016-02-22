@@ -5,7 +5,6 @@
 
 #include <iostream>
 #include <vector>
-#include <eigen3/Eigen/Dense>
 #include <math.h>
 
 using namespace std;
