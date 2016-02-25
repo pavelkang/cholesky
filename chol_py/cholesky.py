@@ -15,21 +15,35 @@ import cyamites as cy
 # 0 - 1 - 2 - 3
 #         |
 #         5
+# pattern_graph =[[],
+#                 [],
+#                 [],
+#                 [],
+#                 [],
+#                 []]
 
-graph = {
-    0: [1],
-    1: [0, 2],
-    2: [1, 3, 4, 5],
-    3: [2],
-    4: [2],
-    5: [2]
-}
+reorder_dict = {0:2, 1:0, 2:1}
+reorder_dict_inv = {v:k for k, v in reorder_dict.iteritems()}
 
-def build_pattern_graph(g):
+def reorder_func(i):
+    return reorder_dict[i]
+
+def reorder_func_inv(i):
+    return reorder_dict_inv[i]
+
+# m: a matrix-representation of the pattern grpah
+# f: a reordering function
+def reorder(m, f):
+    rows, cols = m.shape
+    n = [[0]*cols for i in xrange(rows)]
+    for i in xrange(rows):
+        for j in xrange(cols):
+            n[f(i)][f(j)] = m[(i, j)]
+    return np.matrix(n)
 
 
 def cholesky(m):
-    rows, cols = m.shape[0], m.shape[1]
+    rows, cols = m.shape
     if (rows == 1):
         m[(0, 0)] = sqrt(m[(0, 0)])
         return m
@@ -50,6 +64,21 @@ def main():
     print "matrix is \n", m
     mm = cholesky(m);
     print "factorization is \n", mm
+    m = np.matrix([[4, 12, -16], [12, 37, -43], [-16, -43, 98]])
+    m_reordered = reorder(m, reorder_func)
+    m_reordered_fac = cholesky(m_reordered)
+    print "reordered cholesky is\n", m_reordered_fac
+    print "sparsity is %f, %f" %(calc_sparsity(mm), calc_sparsity(m_reordered_fac))
+
+# return the percentage of nonzero numbers
+def calc_sparsity(m):
+    rows, cols = m.shape
+    nonzeros = 0
+    for i in xrange(rows):
+        for j in xrange(cols):
+            if (m[(i, j)] != 0):
+                nonzeros += 1
+    return float(nonzeros) / (rows * cols)
 
 # def pickFace(vert):
 #     print "register a function here"
